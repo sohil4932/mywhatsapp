@@ -4,21 +4,26 @@ import os
 # will be used to redirect the user once the upload is done
 # and send_from_directory will help us to send/show on the
 # browser the file that the user just uploaded
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from werkzeug import secure_filename
 
-# Initialize the Flask application
-app = Flask(__name__)
+# Import datbase models from db.py
+from models import db, app, data
 
-# This is the path to the upload directory
-app.config['UPLOAD_FOLDER'] = 'uploads/'
-# These are the extension that we are accepting to be uploaded
-app.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg', 'gif'])
+from config import config
+
+import uuid
+
+from flask import request
 
 # For a given file, return whether it's an allowed type or not
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+
+# Route request to 404 page during errors.
+@app.errorhandler(404)
+def page_not_found(error):
+    return 'This page does not exist', 404
 
 # This route will show a form to perform an AJAX request
 # jQuery is loaded to execute the request and update the
@@ -30,6 +35,10 @@ def index():
 # Route that will process the text messages
 @app.route('/message/<int:phone_number>/<text_message>', methods=['POST'])
 def message(phone_number, text_message):
+    # add data into table
+    text_data = data(phone_number = str(phone_number), message_type = config.MESSAGE, data = str(text_message), status = 0)
+    db.session.add(text_data)
+    db.session.commit()
     # Get the data
     return "Succefully added " + text_message + " for " + str(phone_number)
 
@@ -41,10 +50,14 @@ def upload(phone_number):
     # Check if the file is one of the allowed types/extensions
     if file and allowed_file(file.filename):
         # Make the filename safe, remove unsupported chars
-        filename = secure_filename(file.filename)
+        filename = str(uuid.uuid4()) + ".jpg"
         # Move the file form the temporal folder to
         # the upload folder we setup
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        # add data into database
+        image_data = data(phone_number = str(phone_number), message_type = config.IMAGE, data = str(filename), status = 0)
+        db.session.add(image_data)
+        db.session.commit()
         # Redirect the user to the uploaded_file route, which
         # will basicaly show on the browser the uploaded file
         return "Successful Upload for " + str(phone_number) 
