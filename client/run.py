@@ -8,6 +8,7 @@ from yowsup.layers.protocol_acks               import YowAckProtocolLayer
 from yowsup.layers.network                     import YowNetworkLayer
 from yowsup.layers.coder                       import YowCoderLayer
 from yowsup.layers.protocol_presence           import YowPresenceProtocolLayer
+from yowsup.layers.protocol_media              import YowMediaProtocolLayer
 from yowsup.stacks import YowStack
 from yowsup.common import YowConstants
 from yowsup.layers import YowLayerEvent
@@ -23,7 +24,6 @@ def send_message(destination, message, message_type):
         message is string
         e.g send_message('11133434343','hello')
     '''
-    print "Sending message to : " + str(destination) + " with : " + str(message)
     messages = [(destination, message, message_type)]
     
     layers = (EchoLayer,
@@ -31,7 +31,8 @@ def send_message(destination, message, message_type):
                YowMessagesProtocolLayer,
                YowReceiptProtocolLayer,
                YowAckProtocolLayer,
-               YowPresenceProtocolLayer)
+               YowPresenceProtocolLayer,
+               YowMediaProtocolLayer)
               ) + YOWSUP_CORE_LAYERS
     
     stack = YowStack(layers)

@@ -26,7 +26,6 @@ class EchoLayer(YowInterfaceLayer):
     def onSuccess(self, successProtocolEntity):
         for target in self.getProp(self.__class__.PROP_MESSAGES, []):
             phone, message, message_type = target
-            print "Message type : " + message_type
             if int(message_type) == 1:
                 print "Sending message"
                 if '@' in phone:
@@ -46,10 +45,10 @@ class EchoLayer(YowInterfaceLayer):
                 else:
                     jid = "%s@s.whatsapp.net" % phone
                 path = message
+                print "Sending image to : " + jid + " with : " + path
                 entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
                 successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity)
                 errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(jid, path, errorEntity, originalEntity)
-
                 self._sendIq(entity, successFn, errorFn)
 
     @ProtocolEntityCallback("ack")
@@ -71,7 +70,6 @@ class EchoLayer(YowInterfaceLayer):
         self.toLower(entity)
 
     def onRequestUploadResult(self, jid, filePath, resultRequestUploadIqProtocolEntity, requestUploadIqProtocolEntity):
-        print "number : " + str(jid) + " path : " + filepath
         if resultRequestUploadIqProtocolEntity.isDuplicate():
             self.doSendImage(filePath, resultRequestUploadIqProtocolEntity.getUrl(), jid,
                              resultRequestUploadIqProtocolEntity.getIp())
