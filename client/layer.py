@@ -24,7 +24,6 @@ class EchoLayer(YowInterfaceLayer):
 
     @ProtocolEntityCallback("success")
     def onSuccess(self, successProtocolEntity):
-        self.lock.acquire()
         for target in self.getProp(self.__class__.PROP_MESSAGES, []):
             phone, message, message_type = target
             print "Message type : " + message_type
@@ -41,16 +40,17 @@ class EchoLayer(YowInterfaceLayer):
             elif int(message_type) == 2:
                 print "Sending Image"
                 if '@' in phone:
-                    self.demoContactJid = phone
+                    jid = phone
                 elif '-' in phone:
-                    self.demoContactJid = "%s@g.us" % phone
+                    jid = "%s@g.us" % phone
                 else:
-                    self.demoContactJid = "%s@s.whatsapp.net" % phone
-                 
-                self.filePath = message 
-                requestUploadEntity = RequestUploadIqProtocolEntity("image", filePath = message)
-                self._sendIq(requestUploadEntity, self.onRequestUploadResult, self.onRequestUploadError)
-        self.lock.release()
+                    jid = "%s@s.whatsapp.net" % phone
+                path = message
+                entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
+                successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity)
+                errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(jid, path, errorEntity, originalEntity)
+
+                self._sendIq(entity, successFn, errorFn)
 
     @ProtocolEntityCallback("ack")
     def onAck(self, entity):
@@ -66,20 +66,32 @@ class EchoLayer(YowInterfaceLayer):
 
         self.lock.release()
 
-    def onRequestUploadResult(self, resultRequestUploadIqProtocolEntity, requestUploadIqProtocolEntity):
-        mediaUploader = MediaUploader(self.demoContactJid, self.getOwnJid(), self.filePath,
-                                      resultRequestUploadIqProtocolEntity.getUrl(),
-                                      resultRequestUploadIqProtocolEntity.getResumeOffset(),
-                                      self.onUploadSuccess, self.onUploadError, self.onUploadProgress)
-        mediaUploader.start()
-
-    def onRequestUploadError(self, errorRequestUploadIqProtocolEntity, requestUploadIqProtocolEntity):
-        print("Error requesting upload url")
-
-    def onUploadSuccess(self, filePath, jid, url):
-        #convenience method to detect file/image attributes for sending, requires existence of 'pillow' library
-        entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(filePath, url, None, to)
+    def doSendImage(self, filePath, url, to, ip = None):
+        entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(filePath, url, ip, to)
         self.toLower(entity)
 
+    def onRequestUploadResult(self, jid, filePath, resultRequestUploadIqProtocolEntity, requestUploadIqProtocolEntity):
+        print "number : " + str(jid) + " path : " + filepath
+        if resultRequestUploadIqProtocolEntity.isDuplicate():
+            self.doSendImage(filePath, resultRequestUploadIqProtocolEntity.getUrl(), jid,
+                             resultRequestUploadIqProtocolEntity.getIp())
+        else:
+            # successFn = lambda filePath, jid, url: self.onUploadSuccess(filePath, jid, url, resultRequestUploadIqProtocolEntity.getIp())
+            mediaUploader = MediaUploader(jid, self.getOwnJid(), filePath,
+                                      resultRequestUploadIqProtocolEntity.getUrl(),
+                                      resultRequestUploadIqProtocolEntity.getResumeOffset(),
+                                      self.onUploadSuccess, self.onUploadError, self.onUploadProgress, async=False)
+            mediaUploader.start()
+
+    def onRequestUploadError(self, jid, path, errorRequestUploadIqProtocolEntity, requestUploadIqProtocolEntity):
+        logger.error("Request upload for file %s for %s failed" % (path, jid))
+
+    def onUploadSuccess(self, filePath, jid, url):
+        self.doSendImage(filePath, url, jid)
+
     def onUploadError(self, filePath, jid, url):
-        print("Upload file failed!")
+        logger.error("Upload file %s to %s for %s failed!" % (filePath, url, jid))
+
+    def onUploadProgress(self, filePath, jid, url, progress):
+        sys.stdout.write("%s => %s, %d%% \r" % (os.path.basename(filePath), jid, progress))
+        sys.stdout.flush()
