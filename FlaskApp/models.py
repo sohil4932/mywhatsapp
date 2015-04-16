@@ -10,7 +10,7 @@ from flask import Flask
 from config import config
 
 # Create main application object of Flask App
-app = Flask(__name__, static_url_path='static/')
+app = Flask(__name__)
 
 # Configure app with our Database.
 # TODO : Change this database URL with our main database configuration
