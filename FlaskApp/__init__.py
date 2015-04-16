@@ -51,11 +51,12 @@ def upload(phone_number):
     if file and allowed_file(file.filename):
         # Make the filename safe, remove unsupported chars
         filename = str(uuid.uuid4()) + ".jpg"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         # Move the file form the temporal folder to
         # the upload folder we setup
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        file.save(filepath)
         # add data into database
-        image_data = data(phone_number = str(phone_number), message_type = config.IMAGE, data = str(filename), status = 0)
+        image_data = data(phone_number = str(phone_number), message_type = config.IMAGE, data = str(filepath), status = 0)
         db.session.add(image_data)
         db.session.commit()
         # Redirect the user to the uploaded_file route, which
