@@ -19,10 +19,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLDATABASE_URI
 # app.config['SERVER_NAME'] = '127.0.0.1'
 
 # This is the path to the upload directory
-app.config['UPLOAD_FOLDER'] = 'uploads/'
+app.config['UPLOAD_FOLDER'] = config.UPLOAD_FOLDER
 
 # These are the extension that we are accepting to be uploaded
-app.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg', 'gif'])
+app.config['ALLOWED_EXTENSIONS'] = set(['jpg'])
 
 # Create database object.
 db = SQLAlchemy(app)
