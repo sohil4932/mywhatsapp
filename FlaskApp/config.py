@@ -7,7 +7,7 @@ class config():
 	SQLDATABASE_URI = 'mysql://root:hetvi_1234@localhost/mywhatsappdb'
 
 	# upload folder
-	UPLOAD_FOLDER = './static'
+	UPLOAD_FOLDER = 'static/'
 
 	# message type for text message
 	MESSAGE = 1
