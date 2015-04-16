@@ -34,7 +34,7 @@ def do_task():
 			print('closing')
 			res.status = 1
 			session.commit()
-			if message_type = cofig.IMAGE:
+			if message_type == config.IMAGE:
 				try:
 					os.remove(message)
 				except OSError:
