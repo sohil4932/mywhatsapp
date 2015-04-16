@@ -4,7 +4,7 @@ from sqlalchemy import Column, Date, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
  
-engine = create_engine('sql://sohil4932:Hetvi_1234@mywhatsappdb.database.windows.net:1443/mywhatsappdb', echo=True)
+engine = create_engine('mysql://sohil4932:Hetvi_1234@mywhatsappdb.database.windows.net:1443/mywhatsappdb', echo=True)
 Base = declarative_base()  
  
 ########################################################################
