@@ -6,6 +6,7 @@ from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEnt
 from yowsup.layers.protocol_media.protocolentities       import *
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
 import threading
+from config import config
 
 class EchoLayer(YowInterfaceLayer):
 
@@ -26,7 +27,7 @@ class EchoLayer(YowInterfaceLayer):
     def onSuccess(self, successProtocolEntity):
         for target in self.getProp(self.__class__.PROP_MESSAGES, []):
             phone, message, message_type = target
-            if int(message_type) == 1:
+            if int(message_type) == config.MESSAGE:
                 print "Sending message"
                 if '@' in phone:
                     messageEntity = TextMessageProtocolEntity(message, to = phone)
@@ -36,7 +37,7 @@ class EchoLayer(YowInterfaceLayer):
                     messageEntity = TextMessageProtocolEntity(message, to = "%s@s.whatsapp.net" % phone)
                 self.ackQueue.append(messageEntity.getId())
                 self.toLower(messageEntity)
-            elif int(message_type) == 2:
+            elif int(message_type) == config.IMAGE:
                 print "Sending Image"
                 if '@' in phone:
                     jid = phone
