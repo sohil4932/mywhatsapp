@@ -35,10 +35,15 @@ def do_task():
 			res.status = 1
 			session.commit()
 			if message_type == config.IMAGE:
-				try:
-					os.remove(message)
-				except OSError:
-					pass
+				## delete only if file exists ##
+				if os.path.exists(message):
+					try:
+						os.remove(message)
+					except IOError:
+						print("Sorry, I can not remove %s file." % message)
+						pass
+				else:
+					print("Sorry, I can not remove %s file." % message)
 			sys.exit(0)
 
 	else:
