@@ -8,7 +8,7 @@ class Data(Base):
     __tablename__ = "db_data"
 
     id = Column(Integer, primary_key = True)
-    phone_number = Column(Char(13))
+    phone_number = Column(String(13))
     message_type = Column(Integer)
     data = Column(String(255))
     status = Column(Integer)  
