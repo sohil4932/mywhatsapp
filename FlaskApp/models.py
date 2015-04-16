@@ -16,7 +16,7 @@ app = Flask(__name__)
 # TODO : Change this database URL with our main database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLDATABASE_URI
 
-app.config['SERVER_NAME'] = '127.0.0.1:5000'
+app.config['SERVER_NAME'] = '127.0.0.1'
 
 # This is the path to the upload directory
 app.config['UPLOAD_FOLDER'] = 'uploads/'
