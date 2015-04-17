@@ -37,7 +37,7 @@ def do_task():
 			print('closing')
 			res.status = 1
 			session.commit()
-			if message_type == config.IMAGE:
+			if int(message_type) == config.IMAGE:
 				## delete only if file exists ##
 				if os.path.exists(message):
 					try:
