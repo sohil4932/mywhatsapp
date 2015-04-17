@@ -5,7 +5,6 @@ from models import Data
 
 import sys
 import os
-import shutil
 
 from mywhatsapp import send_message
 from config import config
@@ -42,8 +41,8 @@ def do_task():
 				## delete only if file exists ##
 				if os.path.exists(message):
 					try:
-						shutil.rmtree(message)
-					except IOError:
+						os.remove(message)
+					except OSError:
 						print("Sorry, I can not remove %s file." % message)
 						pass
 				else:
