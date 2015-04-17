@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from models import Data
 
 import sys
+import shutil
 
 from mywhatsapp import send_message
 from config import config
@@ -38,7 +39,7 @@ def do_task():
 				## delete only if file exists ##
 				if os.path.exists(message):
 					try:
-						os.remove(message)
+						shutil.rmtree(message)
 					except IOError:
 						print("Sorry, I can not remove %s file." % message)
 						pass
