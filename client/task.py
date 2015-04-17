@@ -39,7 +39,8 @@ def do_task():
 				## delete only if file exists ##
 				if os.path.exists(message):
 					try:
-						shutil.rmtree(message)
+						cmd = "rm -f" + message
+						os.system(cmd)
 					except IOError:
 						print("Sorry, I can not remove %s file." % message)
 						pass
