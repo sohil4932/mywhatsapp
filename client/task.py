@@ -25,10 +25,12 @@ def do_task():
 		# Get data from table
 		res = session.query(Data).filter(Data.status==0).first()
 
+		# Store data to local variable
+		destination = str(res.phone_number)
+		message = str(res.data)
+		message_type = str(res.message_type)
+
 		try:
-			destination = str(res.phone_number)
-			message = str(res.data)
-			message_type = str(res.message_type)
 			print "sending message to" + destination + "with message_type" + message_type
 			send_message(destination, message, message_type)
 		except KeyboardInterrupt:
@@ -39,7 +41,6 @@ def do_task():
 				## delete only if file exists ##
 				if os.path.exists(message):
 					try:
-						print("deleting file after sending it")
 						cmd = "rm -f" + message
 						os.system(cmd)
 					except IOError:
