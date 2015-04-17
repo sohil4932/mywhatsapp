@@ -39,6 +39,7 @@ def do_task():
 				## delete only if file exists ##
 				if os.path.exists(message):
 					try:
+						print("deleting file after sending it")
 						cmd = "rm -f" + message
 						os.system(cmd)
 					except IOError:
