@@ -12,5 +12,3 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 count = session.query(Data).filter(Data.status==0).count()
-
-print count
